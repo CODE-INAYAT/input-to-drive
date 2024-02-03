@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyqs_data</title>
+
+  <!-- GOOGLE fonts links -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Afacad&family=Marcellus&family=Montserrat&family=Quicksand&family=Slabo+27px&display=swap"
+    rel="stylesheet" />
+
+  <!-- tailwind and flowbite links of cdn -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.css" rel="stylesheet" />
+
+  <style>
+    body {
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      font-family: "Montserrat", sans-serif;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .container {
+      background: white;
+      border-radius: 30px;
+      padding: 20px;
+      width: 90%;
+      max-width: 510px;
+      box-shadow: 0 4px 8px 0 rgb(0 0 0 / 79%), 0 6px 20px 0 rgb(0 0 0 / 53%);
+      backdrop-filter: blur(10px);
+      position: absolute;
+      max-height: 551px;
+      overflow-y: auto;
+    }
+
+    @media (max-width: 767px) {
+      .container {
+        width: 93%;
+        max-width: none;
+      }
+    }
+
+    #file-name {
+      text-align: center;
+      /* Center-align the text */
+      margin: 0 auto;
+      /* Center horizontally */
+    }
+
+    /* Default styling for larger screens */
+    @media (min-width: 768px) {
+      #success-popup {
+        top: 1/2;
+        left: 1/2;
+        transform: -translate-x-1/2 -translate-y-1/2;
+        width: 100%;
+        max-width: 400px;
+        /* Adjust the max-width as needed */
+      }
+    }
+
+    /* Responsive styling for smaller screens */
+    @media (max-width: 767px) {
+      #success-popup {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: calc(100% - 2rem);
+        /* Adjust padding or margins as needed */
+        max-width: none;
+      }
+    }
+
+    .dotlottie-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .loading-center {
+      text-align: center;
+    }
+
+    .loading-center svg {
+      display: block;
+      margin: 0 auto;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      z-index: 49;
+      backdrop-filter: blur(3px);
+    }
+  </style>
+</head>
+
+<body class="bg-gray-100 h-screen flex items-center justify-center">
+  <div class="overlay" id="overlay"></div>
+  <div class="container mx-auto p-8">
+    <form id="form">
+      <div class="mb-3">
+        <label for="Full Name" class="block mb-2 text-sm font-medium text-white-900 dark:text-white"><b>Full
+            Name</b></label>
+        <input type="text" id="fullName" name="NAME" oninput="convertToUpperCaseAndRemoveNumbers(this)"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          placeholder="Firstname Middlename Surname" required />
+      </div>
+      <div class="mb-3">
+        <label for="subject"
+          class="block mb-2 text-sm font-medium text-white-900 dark:text-white"><b>Subject:</b></label>
+        <select id="subject" name="SUBJECT"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          placeholder="123-45-678" required>
+          <option disabled selected>Select The Subject</option>
+          <option value="PHY">PHY</option>
+          <option value="MATHS">MATHS</option>
+          <option value="BEE">BEE</option>
+          <option value="EGD">EGD</option>
+          <option value="EGPC">EGPC</option>
+        </select>
+      </div>
+
+      <div class="flex items-center justify-center w-full mb-4">
+        <label for="dropzone-file"
+          class="relative flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
+          <input id="dropzone-file" type="file" name="file" class="hidden" accept="" onchange="updateFileIcon()"
+            required />
+          <div id="file-container" class="flex flex-col items-center justify-center pt-5 pb-6">
+            <svg class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />
+            </svg>
+            <p id="file-name" class="mb-2 text-sm text-gray-500 dark:text-gray-400">
+              <span class="font-semibold">Click to upload</span> or drag and
+              drop
+            </p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">
+              PDF files only
+            </p>
+          </div>
+
+          <div id="file-icon" class="hidden">
+            <div class="mb-4">
+              <div id="file-container" class="flex flex-col items-center justify-center pt-5 pb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor"
+                  class="bi bi-filetype-pdf" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd"
+                    d="M14 4.5V14a2 2 0 0 1-2 2h-1v-1h1a1 1 0 0 0 1-1V4.5h-2A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v9H2V2a2 2 0 0 1 2-2h5.5zM1.6 11.85H0v3.999h.791v-1.342h.803q.43 0 .732-.173.305-.175.463-.474a1.4 1.4 0 0 0 .161-.677q0-.375-.158-.677a1.2 1.2 0 0 0-.46-.477q-.3-.18-.732-.179m.545 1.333a.8.8 0 0 1-.085.38.57.57 0 0 1-.238.241.8.8 0 0 1-.375.082H.788V12.48h.66q.327 0 .512.181.185.183.185.522m1.217-1.333v3.999h1.46q.602 0 .998-.237a1.45 1.45 0 0 0 .595-.689q.196-.45.196-1.084 0-.63-.196-1.075a1.43 1.43 0 0 0-.589-.68q-.396-.234-1.005-.234zm.791.645h.563q.371 0 .609.152a.9.9 0 0 1 .354.454q.118.302.118.753a2.3 2.3 0 0 1-.068.592 1.1 1.1 0 0 1-.196.422.8.8 0 0 1-.334.252 1.3 1.3 0 0 1-.483.082h-.563zm3.743 1.763v1.591h-.79V11.85h2.548v.653H7.896v1.117h1.606v.638z" />
+                </svg>
+              </div>
+              <p id="file-name-display" style="margin-bottom: 20px" class="text-gray-500 dark:text-gray-400"></p>
+            </div>
+          </div>
+        </label>
+      </div>
+
+      <div class="flex items-start mb-4">
+        <div class="flex items-center h-5">
+          <input id="remember" type="checkbox" value=""
+            class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600 dark:ring-offset-gray-800"
+            required />
+        </div>
+        <label for="remember" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">I agree with the
+          <a href="#" class="text-blue-600 hover:underline dark:text-blue-500">terms and conditions</a>.</label>
+      </div>
+      <button id="submit" name="submit" type="submit"
+        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+        Submit
+      </button>
+    </form>
+  </div>
+
+  <div id="success-popup" tabindex="-1"
+    class="hidden overflow-x-hidden fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-[100%] max-w-md">
+    <div class="relative p-4 w-full max-w-md max-h-full">
+      <div class="relative bg-white rounded-lg shadow dark:bg-gray-700" style="border-radius: 30px">
+        <div class="p-4 md:p-5 text-center">
+          <!--<svg class="mx-auto mb-4 text-gray-400 w-12 h-12 dark:text-gray-200" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">-->
+          <div class="dotlottie-container">
+            <dotlottie-player src="https://lottie.host/b262bbf7-05a6-4a30-b6e3-648b52389ffe/o5joDCtkZz.json"
+              background="transparent" speed="1" style="width: 80px; height: 80px" loop autoplay></dotlottie-player>
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+          </div>
+          <!--</svg>-->
+          <h3 class="mb-5" style="color: rgb(45, 45, 45)">
+            Thanks For Participating In RRD, Your Data Has Been Received To
+            Us !
+          </h3>
+          <button data-modal-hide="popup-modal" type="button" id="okButtonInSuccessPopup"
+            class="text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center me-2">
+            OK
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="loading-popup" tabindex="-1"
+    class="hidden fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-[100%] max-w-md">
+    <div class="relative p-4 w-full max-w-md max-h-full">
+      <div class="relative bg-white rounded-lg shadow dark:bg-gray-700" style="border-radius: 30px">
+        <div class="p-4 md:p-5 text-center">
+          <div class="loading-center">
+            <div role="status">
+              <svg aria-hidden="true" class="w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+                viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                  fill="currentColor" />
+                <path
+                  d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                  fill="currentFill" />
+              </svg>
+              <h4 style="margin-top: 15px">Please Wait...</h4>
+              <span class="sr-only">Loading...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!--flowbite JS cdn & svg link-->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+  <script src="https://unpkg.com/@dotlottie/player-component@latest/dist/dotlottie-player.mjs" type="module"></script>
+
+  <script>
+
+    // Function to show overlay
+    function showOverlay() {
+      const overlay = document.getElementById('overlay');
+      overlay.style.display = 'block';
+    }
+
+    // Function to hide overlay
+    function hideOverlay() {
+      const overlay = document.getElementById('overlay');
+      overlay.style.display = 'none';
+    }
+
+    // Function to show loading popup
+    function showLoadingPopup() {
+      showOverlay();
+      const loadingPopup = document.getElementById('loading-popup');
+      loadingPopup.classList.remove('hidden');
+      loadingPopup.classList.add('visible');
+    }
+
+    // Function to hide loading popup
+    function hideLoadingPopup() {
+      hideOverlay();
+      const loadingPopup = document.getElementById('loading-popup');
+      loadingPopup.classList.remove('visible');
+      loadingPopup.classList.add('hidden');
+    }
+
+    // Function to show success popup
+    function showSuccessPopup() {
+      showOverlay();
+      const successPopup = document.getElementById('success-popup');
+      successPopup.classList.remove('hidden');
+      successPopup.classList.add('visible');
+    }
+
+    // Function to hide success popup
+    function hideSuccessPopup() {
+      hideOverlay();
+      const successPopup = document.getElementById('success-popup');
+      successPopup.classList.remove('visible');
+      successPopup.classList.add('hidden');
+    }
+
+    // Function to handle form submission
+    function handleSubmit(event) {
+      event.preventDefault();
+
+      // Show loading popup on form submission
+      showLoadingPopup();
+
+      const file = document.getElementById("dropzone-file").files[0];
+      const fr = new FileReader();
+      fr.readAsArrayBuffer(file);
+
+      fr.onload = (f) => {
+        const url =
+          "https://script.google.com/macros/s/AKfycbybjuyMuhC32NSaZ37oYLa_qoIet01ENRLaMYS1U9S2JEf3rUYgsfnqQaeQlDiGoWjW/exec";
+        const qs = new URLSearchParams({
+          filename: file.name,
+          mimeType: file.type,
+        });
+        fetch(`${url}?${qs}`, {
+          method: "POST",
+          body: JSON.stringify({
+            file: [...new Int8Array(f.target.result)],
+            SUBJECT: document.getElementById("subject").value,
+            NAME: document.getElementById("fullName").value,
+          }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            console.log('Success:', data);
+            // Hide loading popup and show success popup
+            hideLoadingPopup();
+            showSuccessPopup();
+          })
+          .catch((error) => {
+            console.error('Error!', error.message);
+            // Hide loading popup on error
+            hideLoadingPopup();
+          });
+      };
+    }
+
+    // Add an event listener for the form submission
+    document.getElementById("form").addEventListener("submit", handleSubmit);
+
+    // Function to clear form inputs
+    function clearFormInputs() {
+      document.getElementById("form").reset();
+    }
+
+    // Function to handle "OK" button click in success popup
+    function handleOkButtonClick() {
+      // Clear form inputs
+      clearFormInputs();
+
+      // Hide success popup
+      hideSuccessPopup();
+    }
+
+    // Add an event listener for the "OK" button click
+    document.getElementById("okButtonInSuccessPopup").addEventListener("click", handleOkButtonClick);
+
+    // change the upload icon to pdf uploaded icon with fileName
+    function updateFileIcon() {
+      const fileContainer = document.getElementById("file-container");
+      const fileIcon = document.getElementById("file-icon");
+      const fileNameDisplay = document.getElementById("file-name-display");
+
+      const input = document.getElementById("dropzone-file");
+      const fileName = input.files[0].name;
+
+      // Hide file container and show file icon
+      fileContainer.style.display = "none";
+      fileIcon.style.display = "flex"; // Change display to flex
+
+      // Update file name
+      fileNameDisplay.textContent = fileName;
+    }
+
+    function convertToUpperCaseAndRemoveNumbers(inputField) {
+      // Remove any non-letter characters using a regular expression
+      inputField.value = inputField.value
+        .replace(/[^a-zA-Z\s]/g, "")
+        .toUpperCase();
+    }
+
+
+  </script>
+</body>
+
+</html>
